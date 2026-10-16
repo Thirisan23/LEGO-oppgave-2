@@ -1,0 +1,38 @@
+from hub import light_matrix, port
+import motor
+import hub
+import force_sensor
+import time
+import distance_sensor
+
+running = False
+
+def start():
+    global running
+    running = not running
+    return running
+
+def dodge():
+    return distance_sensor.distance(port.C) < 5
+
+while True:
+    if force_sensor.force(port.D) > 0:
+        if start():
+            light_matrix.write('Exercise 2')
+            hub.sound.beep(1000,500, 100)
+            time.sleep(6.7)
+        else:
+            light_matrix.write("Exercise done")
+            hub.sound.beep(600, 500, 100)
+            motor.stop(port.A)
+            motor.stop(port.B)
+            break
+    if running:
+        if dodge():
+            motor.run_for_degrees(port.A, 360, 720)
+            motor.run_for_degrees(port.B, -360, 720)
+            time.sleep(0.2)
+        else:
+            motor.run(port.A, 600)
+            motor.run(port.B, 600)
+            time.sleep(0.05)
